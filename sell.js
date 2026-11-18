@@ -32,8 +32,10 @@
 
   async function lastSale(id) {
     try {
-      const c = JSON.parse(sessionStorage.getItem('kqp.cache') || '{}')[id];
-      if (c && c.p && Date.now() - c.at < 30 * 60 * 1000) return c.p;
+      // 0.6.12: the chips' cache moved to localStorage (6 h, shared by tabs) in 0.6.5; this still
+      // looked in the old per-tab copy, so it never reused a chip's price.
+      const c = JSON.parse(localStorage.getItem('kqp.cache') || '{}')[id];
+      if (c && c.p && !c.err && Date.now() - c.at < 6 * 60 * 60 * 1000) return c.p;
     } catch (e) { /* ignore */ }
     const r = await fetch('/api/cards/' + id + '/prices', { credentials: 'include' });
     if (!r.ok) throw new Error(r.status === 429 ? 'rate limited' : 'HTTP ' + r.status);

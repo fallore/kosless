@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "KosLess",
   "short_name": "KosLess",
-  "version": "0.6.9",
+  "version": "0.6.12",
   "description": "Unofficial Kosmora helper: readable pack summaries with sale prices, a pulls panel with bulk sell, sell-page price helpers, quest badges, and hotkeys for packs, albums and navigation.",
   "permissions": [
     "storage"
@@ -44,7 +44,8 @@
         "layout.js",
         "prices.js",
         "keys.js",
-        "sell.js"
+        "sell.js",
+        "batch.js"
       ],
       "css": [
         "style.css",

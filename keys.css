@@ -85,3 +85,13 @@ span.kq-sell-chip { cursor: default; color: #bbb; border-color: rgba(255, 255, 2
 #kq-legend .kq-lg-pack { color: #9f99b8; }
 #kq-legend .kq-lg-setup { color: #ffd66e; }
 @media (max-width: 899px) { #kq-legend { display: none; } }
+
+/* batch sell page info line (batch.js, 0.6.12) */
+.kq-bline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; font: 600 12px/1.3 system-ui, sans-serif; color: #c9c2e8; }
+.kq-bline:empty { display: none; }
+.kq-bl-fill, .kq-bl-ask {
+  padding: 2px 8px; border-radius: 7px; border: 1px solid rgba(255, 214, 110, .45); background: rgba(40, 28, 10, .6);
+  color: #ffe3a0; font: 700 12px/1.3 system-ui, sans-serif; cursor: pointer;
+}
+.kq-bl-fill:hover, .kq-bl-ask:hover { background: rgba(90, 60, 10, .85); }
+.kq-bl-note { color: #a9a3c7; font-weight: 500; }

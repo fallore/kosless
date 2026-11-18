@@ -135,6 +135,26 @@
     pump();
   }
 
+  // 0.6.12: the batch sell page (batch.js) reads cached prices and asks for new ones through the same
+  // paced queue. A click there goes to the front of the queue (it's the card you're looking at); the
+  // spacing between reads is unchanged.
+  window.__kqp = {
+    get(id, finish) {
+      const key = id + (finish ? ':' + finish : '');
+      return fresh(key) ? cache[key] : null;
+    },
+    request(id, finish, cb) {
+      const key = id + (finish ? ':' + finish : '');
+      if (fresh(key)) { cb(cache[key]); return; }
+      const list = waiting.get(key);
+      if (list) { list.push(cb); return; }
+      waiting.set(key, [cb]);
+      queue.unshift({ key, id, finish, fa: false, name: '', rarity: '' });
+      pump();
+    },
+    queued: () => queue.length,
+  };
+
   function pump() {
     if (busy || !queue.length) return;
     const now = Date.now();
@@ -154,7 +174,7 @@
     if (Date.now() < (sh.pausedUntil || 0) || (sh.lastAt && Date.now() - sh.lastAt < GAP_MIN)) { busy = false; pump(); return; }
     if (queue.length && fresh(queue[0].key)) {   // another tab read this card meanwhile
       const done = queue.shift();
-      (waiting.get(done.key) || []).forEach((li) => { if (li.isConnected) render(li, done.key); });
+      (waiting.get(done.key) || []).forEach((li) => { if (typeof li === 'function') { try { li(cache[done.key]); } catch (e) { /* ignore */ } } else if (li.isConnected) render(li, done.key); });
       waiting.delete(done.key);
       busy = false; pump(); return;
     }
@@ -171,7 +191,7 @@
         pausedUntil = Date.now() + Math.max(30, isFinite(ra) ? ra : 60) * 1000;
         setPace({ pausedUntil });   // every tab waits, not just this one
         queue.unshift(job);   // try this card again after the pause
-        (waiting.get(job.key) || []).forEach((li) => render(li, job.key));
+        (waiting.get(job.key) || []).forEach((li) => { if (li instanceof Element) render(li, job.key); });
         busy = false; pump(); return;
       }
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -188,7 +208,10 @@
     saveCache();
     // Tell the panel even if the card is no longer on screen (you left the summary meanwhile).
     if (!entry.err) announce(job.key, entry);
-    (waiting.get(job.key) || []).forEach((li) => { if (li.isConnected) render(li, job.key); });
+    (waiting.get(job.key) || []).forEach((li) => {
+      if (typeof li === 'function') { try { li(entry); } catch (e) { /* ignore */ } }
+      else if (li.isConnected) render(li, job.key);
+    });
     waiting.delete(job.key);
     busy = false;
     pump();

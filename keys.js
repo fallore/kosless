@@ -194,20 +194,28 @@
       btn.click();
     }, rand(350, 900));
   }
-  let dismissed = new WeakSet();
+  // 0.6.11: remember what each popup SAID, not just the element. Ten packs at once can queue a Rogue
+  // and a Mega popup back to back, and if Kosmora reuses the same box for the second one, a plain
+  // "seen this element" check skipped it (Nov 18). After each click, look again in case the next
+  // popup is already up and no further page change comes to wake the observer.
+  let dismissed = new WeakMap();
   let dismissTimer = 0;
+  const dropSig = (m) => m.className + '|' + (m.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120);
   function tryAutoDismiss() {
     const s = S();
     if (!s.pack.enabled || !s.pack.autoDismiss || location.pathname !== OPEN || dismissTimer) return;
     const m = topModal();
-    if (!m) { dismissed = new WeakSet(); return; }   // popup closed: if Kosmora reuses the element, the next one still counts
-    if (!m.matches('.ko-drop') || dismissed.has(m)) return;
+    if (!m) { dismissed = new WeakMap(); return; }
+    if (!m.matches('.ko-drop')) return;
     if (!m.classList.contains('ko-drop-rogue') && !m.classList.contains('ko-drop-mega')) return;
-    dismissed.add(m);
+    const sig = dropSig(m);
+    if (dismissed.get(m) === sig) return;
+    dismissed.set(m, sig);
     dismissTimer = setTimeout(() => {
       dismissTimer = 0;
       const b = m.isConnected && find(m, SEL.dropBtn);
       if (b) b.click();
+      for (const ms of [700, 1600, 3000]) setTimeout(() => { try { tryAutoDismiss(); } catch (e) { /* ignore */ } }, ms);
     }, rand(500, 1200));
   }
   let pend = 0;

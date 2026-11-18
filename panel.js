@@ -207,6 +207,21 @@
   // The page may rebuild <body> children on navigation; put the panel back if it goes.
   new MutationObserver(() => { if (panel && !panel.isConnected) schedule(); }).observe(document.documentElement, { childList: true, subtree: false });
   setInterval(() => { if (panel && !panel.isConnected) schedule(); }, 2000);
+  // 0.6.10: after "Sell N" the batch page sits at /market/sell/batch?s=<ids>, and Kosmora keeps
+  // re-adding those ids to the saved draft while they're in the address, so Clear draft looked
+  // broken. Once the linked cards show on the page (the draft has them), drop ?s= from the address
+  // without a reload; the draft stays saved and Clear draft works again.
+  let stripTries = 0;
+  setInterval(() => {
+    if (location.pathname !== '/market/sell/batch' || !/[?&]s=/.test(location.search)) { stripTries = 0; return; }
+    const ids = (new URLSearchParams(location.search).get('s') || '').split(',').filter(Boolean);
+    const shown = [...document.querySelectorAll('img')].some((im) => ids.some((id) => (im.currentSrc || im.src || '').includes('/media/cards/' + id + '/')));
+    if (!shown) return;
+    if (++stripTries < 3) return;   // let the page finish saving (about 1 s after the cards show)
+    const u = new URL(location.href);
+    u.searchParams.delete('s');
+    history.replaceState(history.state, '', u.pathname + (u.search || '') + u.hash);
+  }, 400);
   // 0.6.9: hidden on Nadir pages, where it sat over the game's End turn button and Auto switch.
   setInterval(() => { if (panel) panel.style.display = location.pathname.startsWith('/nadir') ? 'none' : ''; }, 300);
   render();
