@@ -19,6 +19,9 @@ Not made by or affiliated with Kosmora.
 - Every card priced this session, priciest first, with a minimum-price filter. Quest cards
   always show. Card names link to the card's page.
 - **Select → Sell N** opens Kosmora's *Sell several cards* page with the ticked cards (up to 60).
+  They stay ticked and marked *sent to Sell*, so once they're listed, **Remove** takes them off the list.
+- The **×** on a row (shows on hover) removes that one card; the **×** in the header clears the
+  whole list. This only tidies the list: your cards are never touched.
 
 **Sell page**
 - Quick price buttons, **Last sale** and **Lowest listed** (click to fill, with an adjustment),

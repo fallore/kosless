@@ -34,10 +34,38 @@
     store.set(sessionStorage, LIST_KEY, rows);
   }
 
+  // Which pack opening (or page) a pull was seen on. A recap of the same opening has the same id.
+  const ctx = () => (location.pathname === '/packs/open' && new URLSearchParams(location.search).get('id')) || location.pathname;
+
+  // 0.6.13: removed rows. The price chips announce a card again every time its summary is drawn
+  // (from the cache), so a removed row would come straight back on Back or a recap. Remember where
+  // each removed row was seen and ignore it there; the same card from a different pack comes back.
+  const HIDDEN_KEY = 'kqp.hidden';
+  const hidden = store.get(sessionStorage, HIDDEN_KEY, {});   // key -> ctx it was removed from
+  function remove(keys) {
+    for (const k of keys) {
+      if (!rows[k]) continue;
+      hidden[k] = rows[k].ctx || '';
+      delete rows[k];
+      picked.delete(k);
+    }
+    const hk = Object.keys(hidden);
+    if (hk.length > 400) hk.slice(0, hk.length - 400).forEach((k) => delete hidden[k]);
+    store.set(sessionStorage, HIDDEN_KEY, hidden);
+    savePicked(); save(); render();
+  }
+  function isHidden(key) {
+    if (!(key in hidden)) return false;
+    if (hidden[key] === ctx()) return true;
+    delete hidden[key];   // seen in another pack: a new pull, show it again
+    store.set(sessionStorage, HIDDEN_KEY, hidden);
+    return false;
+  }
+
   // Rows are keyed like the price chips: "<id>" for plain, "<id>:veil" for shiny, so a plain and
   // a shiny copy of the same card get their own rows. row.id is always the card id.
   function upsert(key, patch) {
-    const r = rows[key] || { key, id: String(key).split(':')[0], at: Date.now() };
+    const r = rows[key] || { key, id: String(key).split(':')[0], at: Date.now(), ctx: ctx() };
     Object.assign(r, patch);
     rows[key] = r;
     save();
@@ -47,6 +75,7 @@
   window.addEventListener('kqp-price', (ev) => {
     const d = ev.detail; if (!d || !d.id) return;
     const key = d.key || d.id;
+    if (isHidden(key)) return;
     const plain = rows[d.id];
     upsert(key, { name: d.name || (rows[key] && rows[key].name) || 'card ' + d.id, rarity: d.rarity, finish: d.finish,
       median: d.median, last: d.last, count: d.count, priced: true,
@@ -55,6 +84,7 @@
   window.addEventListener('kqs-pull', (ev) => {
     const d = ev.detail; if (!d || !d.id) return;
     const key = d.key || d.id;   // "<id>:veil" for a shiny copy, like the price rows
+    if (isHidden(key)) return;
     const was = rows[key];
     upsert(key, { name: (was && was.name) || d.name, quest: d.quest, kind: d.kind });
     if (!was || !was.quest) expand();
@@ -68,9 +98,10 @@
       '<label class="kqp-min" title="Hide cards whose median is below this (quest cards always show)">min <select></select></label>' +
       '<button type="button" class="kqp-pick" title="Pick cards to sell together">Select</button>' +
       '<button type="button" class="kqp-gear" title="KosLess settings (Shift+/)" aria-label="Settings">⚙</button>' +
-      '<button type="button" class="kqp-clear" title="Clear" aria-label="Clear pulls">×</button></header><ul></ul>' +
+      '<button type="button" class="kqp-clear" title="Clear the whole list (your cards are not touched)" aria-label="Clear pulls">×</button></header><ul></ul>' +
       '<footer class="kqp-sellbar"><button type="button" class="kqp-all">All shown</button><button type="button" class="kqp-none">None</button>' +
-      '<span></span><button type="button" class="kqp-sell">Sell 0</button></footer>';
+      '<span></span><button type="button" class="kqp-drop" title="Take the ticked cards off this list (your cards are not touched)">Remove</button>' +
+      '<button type="button" class="kqp-sell">Sell 0</button></footer>';
     const sel = panel.querySelector('select');
     for (const m of MINS) {
       const o = document.createElement('option');
@@ -82,8 +113,9 @@
     // blur after a change, or hotkeys stay off and letters/digits keep changing the minimum
     sel.addEventListener('change', () => { min = Number(sel.value); store.set(localStorage, MIN_KEY, min); sel.blur(); render(); });
     panel.querySelector('.kqp-clear').addEventListener('click', (ev) => {
-      ev.stopPropagation(); rows = {}; picked.clear(); savePicked(); save(); render();
+      ev.stopPropagation(); remove(Object.keys(rows));
     });
+    panel.querySelector('.kqp-drop').addEventListener('click', () => remove([...picked]));
     panel.querySelector('.kqp-gear').addEventListener('click', (ev) => { ev.stopPropagation(); window.__kq && window.__kq.openDialog(); });
     panel.querySelector('.kqp-pick').addEventListener('click', (ev) => {
       ev.stopPropagation(); picking = !picking; store.set(sessionStorage, PICKING_KEY, picking); expand(); render();
@@ -97,6 +129,9 @@
     panel.querySelector('.kqp-sell').addEventListener('click', () => {
       const ids = [...new Set([...picked].filter((k) => rows[k]).map((k) => rows[k].id))].slice(0, 60);
       if (!ids.length) return;
+      // Mark them, and keep them ticked, so after listing them one Remove takes them off the list.
+      for (const k of picked) if (rows[k]) rows[k].sent = true;
+      save();
       // Kosmora's own batch sell page; it adds these to your saved sell draft (merging with
       // anything already there). Nothing is listed until you press its sell button.
       location.assign('/market/sell/batch?s=' + ids.join(','));
@@ -137,6 +172,10 @@
     const sellBtn = panel.querySelector('.kqp-sell');
     sellBtn.textContent = 'Sell ' + Math.min(n, 60) + (n > 60 ? ' (max 60)' : '');
     sellBtn.disabled = !n;
+    const dropBtn = panel.querySelector('.kqp-drop');
+    const nDrop = [...picked].filter((k) => rows[k]).length;
+    dropBtn.textContent = 'Remove' + (nDrop ? ' ' + nDrop : '');
+    dropBtn.disabled = !nDrop;
     sellBtn.title = n ? 'Open Kosmora\'s Sell several cards page with these ' + Math.min(n, 60) + ' cards (adds them to your sell draft; you still set prices and confirm there)' : 'Tick some cards first';
     // The batch link takes card ids only, so Kosmora picks which copy goes in. Say so when it matters.
     const pickedRows = [...picked].map((k) => rows[k]).filter(Boolean);
@@ -179,13 +218,25 @@
         cb.addEventListener('change', () => { if (cb.checked) picked.add(r.key); else picked.delete(r.key); savePicked(); render(); });
         top.append(cb);
       }
-      top.append(dot, name, price);
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'kqp-del'; del.textContent = '×';
+      del.title = 'Take ' + r.name + ' off this list (the card is not touched)';
+      del.setAttribute('aria-label', del.title);
+      del.addEventListener('click', (ev) => { ev.stopPropagation(); remove([r.key]); });
+      top.append(dot, name, price, del);
       li.appendChild(top);
       if (r.quest) {
         const q = document.createElement('small');
         q.className = 'kqp-quest kqs-' + (r.kind || 'keep');
         q.textContent = r.quest + ' · ' + (QUEST_TEXT[r.kind] || 'quest card');
         li.appendChild(q);
+      }
+      if (r.sent) {
+        const s = document.createElement('small');
+        s.className = 'kqp-sent';
+        s.textContent = 'sent to Sell';
+        s.title = 'You opened the sell page with this card. Listed it? Remove it here.';
+        li.appendChild(s);
       }
       li.addEventListener('click', () => {
         const card = document.querySelector('li[data-kqp="' + CSS.escape(r.key) + '"]');

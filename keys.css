@@ -67,6 +67,13 @@ span.kq-sell-chip { cursor: default; color: #bbb; border-color: rgba(255, 255, 2
 #kqs-panel .kqp-sellbar .kqp-sell { color: #1b1206; background: #e2b955; border-color: #e2b955; font-weight: 700; }
 #kqs-panel .kqp-sellbar .kqp-sell:disabled { opacity: .45; cursor: default; }
 #kqs-panel .kqp-cb { margin: 0; accent-color: #e2b955; }
+#kqs-panel .kqp-sellbar .kqp-drop:disabled { opacity: .45; cursor: default; }
+/* 0.6.13: per-row remove, shown on hover (always on touch screens) */
+#kqs-panel .kqp-del { flex: none; font-size: 14px; color: #888; opacity: 0; padding: 0 2px; }
+#kqs-panel li:hover .kqp-del, #kqs-panel .kqp-del:focus-visible { opacity: 1; }
+#kqs-panel .kqp-del:hover { color: #f87171; }
+@media (hover: none) { #kqs-panel .kqp-del { opacity: 1; } }
+#kqs-panel .kqp-sent { display: inline-block; margin: 2px 0 0 14px; padding: 0 6px; border-radius: 4px; font-size: 11px; color: #1b1206; background: #e2b955; }
 
 /* key legend (bottom of pack pages, left of the cards-per-row pill) */
 #kq-legend {
