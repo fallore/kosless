@@ -28,7 +28,7 @@ Not made by or affiliated with Kosmora.
 **Hotkeys** (all changeable in settings)
 - **Albums**: point at a card and press a key to add it to an album (for example, a "sell" album).
   Your album keys are listed at the bottom of pack pages; click the list to change them.
-- **Pack opening**: next card, previous, first/last, skip, next pack, open card; any key dismisses
+- **Pack opening**: next card, previous, first/last, skip, next pack, open card, price the focused card (Q); any key dismisses
   a found-pack popup. Optional auto-skip and auto-dismiss (off by default).
 - **Navigation**: Shift+letter to jump to Home, Collection, Market, Packs, Talents and more.
 

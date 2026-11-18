@@ -41,7 +41,7 @@
 .ko-grid > li > .kqp-chip.kqp-wait { background: rgba(20, 20, 30, .75); color: #bbb; }
 .ko-grid > li > .kqp-chip.kqp-err  { background: rgba(110, 30, 30, .9); }
 .ko-grid > li > .kqp-btn {
-  right: 6px; width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255, 214, 110, .5);
+  right: 6px; width: 29px; height: 29px; font-size: 14px; border-radius: 50%;   /* 0.6.6: 20% bigger, right edge fixed */ border: 1px solid rgba(255, 214, 110, .5);
   background: rgba(15, 15, 25, .82); color: #ffd66e; cursor: pointer; padding: 0; opacity: .75;
 }
 .ko-grid > li > .kqp-btn:hover { opacity: 1; background: rgba(60, 40, 8, .95); }

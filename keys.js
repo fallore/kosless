@@ -262,6 +262,11 @@
           } else if (action === 'seeCard') {
             const c = focusedLi && focusedLi.isConnected ? cardOf(focusedLi) : targetCard();
             if (c) { consume(ev); handled = ev.code; go('/card/' + c.id); }
+          } else if (action === 'price') {
+            // Same as clicking the card's $ (prices.js): the focused card (A/D), else the one under the pointer.
+            const t = focusedLi && focusedLi.isConnected ? null : targetCard();
+            const li = focusedLi && focusedLi.isConnected ? focusedLi : t && t.root && t.root.closest('.ko-grid > li');
+            if (li) { consume(ev); handled = ev.code; const b = li.querySelector(':scope > .kqp-btn'); if (b) b.click(); }
           }
           return;
         }
@@ -325,6 +330,7 @@
     if (pk.nextCard) add(pk.nextCard, 'next', 'kq-lg-pack');
     if (pk.skip) add(pk.skip, 'skip', 'kq-lg-pack');
     if (pk.nextPack) add(pk.nextPack, 'next pack', 'kq-lg-pack');
+    if (pk.price) add(pk.price, 'price', 'kq-lg-pack');
   }
   kq.onChange(() => { legendSig = ''; renderLegend(); });
 

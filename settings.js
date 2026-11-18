@@ -18,7 +18,7 @@
     },
     pack: {
       enabled: true,
-      keys: { nextCard: 'KeyD', previousCard: 'KeyA', skip: 'KeyS', nextPack: 'KeyE', seeCard: 'KeyW', firstCard: 'Home', lastCard: 'End' },
+      keys: { nextCard: 'KeyD', previousCard: 'KeyA', skip: 'KeyS', nextPack: 'KeyE', seeCard: 'KeyW', firstCard: 'Home', lastCard: 'End', price: 'KeyQ' },
       anyKeyDismiss: true,
       autoSkip: false,
       autoDismiss: false,
@@ -50,7 +50,7 @@
   };
   const PACK_LABELS = {
     nextCard: 'Next card (tear / reveal / next on summary)', previousCard: 'Previous card (summary)', skip: 'Skip opening',
-    nextPack: 'Next pack', seeCard: 'Open focused card', firstCard: 'First card (summary)', lastCard: 'Last card (summary)',
+    nextPack: 'Next pack', seeCard: 'Open focused card', firstCard: 'First card (summary)', lastCard: 'Last card (summary)', price: 'Price of the focused card (summary, same as its $)',
   };
 
   const clone = (o) => JSON.parse(JSON.stringify(o));
