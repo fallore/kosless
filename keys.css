@@ -1,0 +1,87 @@
+/* KosLess: settings dialog, toasts, sell helpers, hotkey focus, album tags (Nov 17, 2026). */
+#kq-toasts { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 2147483647; display: grid; gap: 6px; pointer-events: none; }
+.kq-toast {
+  padding: 8px 14px; border-radius: 8px; background: rgba(15, 15, 25, .95); color: #f1eefc;
+  font: 600 13px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+  border: 1px solid rgba(255, 255, 255, .15); animation: kq-in .18s ease-out;
+}
+.kq-toast-ok { border-color: rgba(47, 191, 108, .7); }
+.kq-toast-err { border-color: rgba(230, 80, 80, .8); }
+@keyframes kq-in { from { opacity: 0; transform: translateY(-6px); } }
+
+.kq-album-tag {
+  position: absolute; left: 6px; bottom: 26%; z-index: 6; pointer-events: none;
+  padding: 2px 7px; border-radius: 6px; background: rgba(31, 157, 85, .94); color: #fff;
+  font: 700 11px/1.2 system-ui, sans-serif; max-width: calc(100% - 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ko-grid > li.kq-focus .kc-article, .ko-grid > li.kq-focus > button.ko-grid-open { outline: 3px solid #f9e6b6; outline-offset: 3px; border-radius: 8px; }
+
+/* sell page */
+.kq-sell { display: grid; gap: 6px; margin: -6px 0 4px; }
+.kq-sell-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.kq-sell-chip {
+  padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255, 214, 110, .4); background: rgba(40, 28, 10, .6);
+  color: #ffe3a0; font: 600 13px/1.2 system-ui, sans-serif; cursor: pointer;
+}
+button.kq-sell-chip:hover { background: rgba(90, 60, 10, .8); }
+span.kq-sell-chip { cursor: default; color: #bbb; border-color: rgba(255, 255, 255, .15); background: rgba(255, 255, 255, .04); }
+.kq-sell-warn { color: #ff8a8a; font: 700 12px/1.3 system-ui, sans-serif; letter-spacing: .03em; min-height: 0; }
+.kq-sell-warn:empty { display: none; }
+
+/* settings dialog */
+#kq-settings { position: fixed; inset: 0; z-index: 2147483647; background: rgba(0, 0, 0, .55); display: grid; place-items: center; }
+#kq-settings .kq-dlg {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); display: flex; flex-direction: column;
+  background: #14121f; color: #eee; border: 1px solid rgba(255, 255, 255, .18); border-radius: 12px;
+  font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 10px 40px rgba(0, 0, 0, .6);
+}
+#kq-settings header, #kq-settings footer { display: flex; align-items: center; gap: 8px; padding: 10px 14px; }
+#kq-settings header { justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, .1); }
+#kq-settings footer { border-top: 1px solid rgba(255, 255, 255, .1); }
+#kq-settings footer span { flex: 1; }
+#kq-settings .kq-body { overflow: auto; padding: 4px 14px 10px; }
+#kq-settings section { padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, .07); display: grid; gap: 5px; }
+#kq-settings h4 { margin: 0 0 2px; font-size: 14px; }
+#kq-settings .kq-hint { margin: 0; color: #aaa; font-size: 12px; }
+#kq-settings .kq-grid, #kq-settings .kq-albums { display: grid; gap: 4px; }
+#kq-settings .kq-grid > div, #kq-settings .kq-albums > div { display: flex; align-items: center; gap: 8px; }
+#kq-settings .kq-grid > div > span, #kq-settings .kq-albums > div > span { flex: 1; }
+#kq-settings button, #kq-settings select, #kq-settings input[type="text"], #kq-settings input[type="number"] {
+  background: #23202f; color: #eee; border: 1px solid rgba(255, 255, 255, .2); border-radius: 6px; font: inherit; padding: 3px 8px;
+}
+#kq-settings input[type="number"] { width: 70px; }
+#kq-settings input.kq-quick { width: 260px; }
+#kq-settings .kq-key { min-width: 90px; }
+#kq-settings .kq-save { background: #8a6a1e; border-color: #c9a24a; }
+#kq-settings .kq-mins { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+#kq-settings .kq-x { border: 0; background: none; font-size: 18px; }
+
+/* Pulls panel: bulk sell */
+#kqs-panel .kqp-pick, #kqs-panel .kqp-gear { color: #ddd; font-size: 12px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 5px; padding: 1px 6px; }
+#kqs-panel .kqp-gear { font-size: 13px; }
+#kqs-panel.kqs-collapsed .kqp-pick, #kqs-panel.kqs-collapsed .kqp-gear { display: none; }
+#kqs-panel .kqp-sellbar { display: none; position: sticky; bottom: 0; gap: 6px; align-items: center; padding: 6px 10px; background: rgba(15, 15, 25, .98); border-top: 1px solid rgba(255, 255, 255, .1); }
+#kqs-panel.kqp-picking:not(.kqs-collapsed) .kqp-sellbar { display: flex; }
+#kqs-panel .kqp-sellbar span { flex: 1; }
+#kqs-panel .kqp-sellbar button { color: #ddd; font-size: 12px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 5px; padding: 2px 8px; }
+#kqs-panel .kqp-sellbar .kqp-sell { color: #1b1206; background: #e2b955; border-color: #e2b955; font-weight: 700; }
+#kqs-panel .kqp-sellbar .kqp-sell:disabled { opacity: .45; cursor: default; }
+#kqs-panel .kqp-cb { margin: 0; accent-color: #e2b955; }
+
+/* key legend (bottom of pack pages, left of the cards-per-row pill) */
+#kq-legend {
+  position: fixed; bottom: 46px; right: calc(50% + 78px); z-index: 2147483645; max-width: calc(50% - 100px);
+  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 10px; padding: 5px 10px; border-radius: 10px;
+  background: rgba(15, 12, 30, .94); border: 1px solid rgba(255, 214, 110, .45); color: #ece6ff; cursor: pointer;
+  font: 600 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+}
+#kq-legend:hover { border-color: rgba(255, 214, 110, .8); }
+#kq-legend[hidden] { display: none; }
+#kq-legend .kq-lg { white-space: nowrap; }
+#kq-legend kbd {
+  display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 4px; text-align: center;
+  background: #2a2540; border: 1px solid rgba(255, 214, 110, .45); color: #ffd66e; font: 700 11px/16px system-ui, sans-serif;
+}
+#kq-legend .kq-lg-pack { color: #9f99b8; }
+#kq-legend .kq-lg-setup { color: #ffd66e; }
+@media (max-width: 899px) { #kq-legend { display: none; } }

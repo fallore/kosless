@@ -1,0 +1,67 @@
+/* Kosmora layout tweaks (Nov 17, 2026). Display-only CSS: no requests, nothing clicked.
+   Lets the browser stay at 100% zoom everywhere and fixes the two pages that needed zoom. */
+
+/* 1. Multi-pack summary grid (10 packs, megapacks, recaps).
+   The site uses 10 cards per row at >= 1100 px, which makes card text tiny. Card text is sized
+   in container units (cqw), so fewer columns = bigger, readable cards. --kqs-cols comes from
+   layout.js (the - / + pill and keys); default 5, about what 150% browser zoom gave. */
+@media (min-width: 900px) {
+  .ko-grid.ko-grid-many:not(.t3d-grid) { --ko-cols: var(--kqs-cols, 5) !important; }
+  .ko-grid-many:not(.t3d-grid) .ko-new-caption { font-size: .62rem; }
+}
+
+#kqs-cols {
+  position: fixed; left: 50%; bottom: 46px; transform: translateX(-50%); z-index: 2147483645;
+  display: none; align-items: center; gap: 2px; padding: 3px; border-radius: 99px;
+  background: rgba(15, 15, 25, .9); border: 1px solid rgba(255, 214, 110, .35); color: #fff3d6;
+  font: 600 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+}
+#kqs-cols.kqs-on { display: flex; }
+#kqs-cols button {
+  width: 26px; height: 26px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255, 255, 255, .08); color: inherit; font: 700 15px/1 system-ui, sans-serif;
+}
+#kqs-cols button:hover { background: rgba(255, 214, 110, .25); }
+#kqs-cols span { padding: 0 8px; white-space: nowrap; }
+
+/* Price chips (prices.js): over the top of the card art, below the name plate. Above the site's
+   full-card "open" button (z-index 2) so the $ stays clickable. */
+.ko-grid > li > .kqp-chip, .ko-grid > li > .kqp-btn {
+  position: absolute; top: 15%; z-index: 6;
+  font: 700 12px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .55);
+}
+.ko-grid > li > .kqp-chip {
+  left: 6px; max-width: calc(100% - 12px); padding: 3px 7px; border-radius: 6px;
+  background: rgba(20, 20, 30, .9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  pointer-events: auto; cursor: help;
+}
+.ko-grid > li > .kqp-chip.kqp-ok   { background: rgba(120, 86, 10, .94); color: #fff3d6; }
+.ko-grid > li > .kqp-chip.kqp-none { background: rgba(60, 64, 80, .92); color: #d6d9e6; }
+.ko-grid > li > .kqp-chip.kqp-wait { background: rgba(20, 20, 30, .75); color: #bbb; }
+.ko-grid > li > .kqp-chip.kqp-err  { background: rgba(110, 30, 30, .9); }
+.ko-grid > li > .kqp-btn {
+  right: 6px; width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255, 214, 110, .5);
+  background: rgba(15, 15, 25, .82); color: #ffd66e; cursor: pointer; padding: 0; opacity: .75;
+}
+.ko-grid > li > .kqp-btn:hover { opacity: 1; background: rgba(60, 40, 8, .95); }
+
+/* 2. Sell page (/market/sell?subject=...): put "Last sales of this card" and "History" in a third
+   column beside the form, so they show without scrolling. Only on wide windows; narrower ones
+   keep the site's own layout. */
+@media (min-width: 1440px) {
+  .screen:has(> .deal .sell-form) { max-width: min(1760px, 100%); }
+  .screen:has(> .deal .sell-form) > .deal { grid-template-columns: 320px minmax(0, 1fr); gap: 36px; }
+  .deal:has(.sell-form) .deal-visual .cd-card { width: 300px; }
+  .deal-info:has(> .sell-form) {
+    max-width: none;
+    grid-template-columns: minmax(360px, 600px) minmax(280px, 1fr);
+    grid-template-rows: auto auto 1fr; /* the form's extra height lands in the empty last row */
+    column-gap: 32px; row-gap: 18px; align-items: start;
+  }
+  .deal-info:has(> .sell-form) > .sell-form { grid-column: 1; grid-row: 1 / -1; }
+  .deal-info:has(> .sell-form) > :not(.sell-form) { grid-column: 2; }
+  /* Last sales first: that's the "has it sold before" check. History (owners) after it. */
+  .deal-info:has(> .sell-form) > .sec { grid-row: 1; }
+  .deal-info:has(> .sell-form) > .ch-sec { grid-row: 2; }
+}

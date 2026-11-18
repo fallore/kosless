@@ -1,0 +1,62 @@
+/* Kosmora KosLess */
+.kqs-badge {
+  position: absolute; bottom: 33%; left: 6px; z-index: 5; pointer-events: none; /* over the lower art, clear of the name plate and footer */
+  font: 700 11px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .02em;
+  padding: 3px 7px; border-radius: 6px; color: #fff; background: rgba(20, 20, 30, .88);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .5); max-width: calc(100% - 12px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kqs-lights { background: #1f9d55; }   /* followed quest, star not lit yet: this copy lights it */
+.kqs-lit    { background: #3b5bdb; }   /* followed quest, star already lit: sale stock */
+.kqs-keep   { background: #b7791f; }   /* quest you don't follow yet: keep, it lights the moment you follow */
+.kqs-dead   { background: #6b7280; }   /* gift/trade copy: never counts, sell */
+
+#kqs-panel {
+  position: fixed; right: 12px; bottom: 46px; z-index: 2147483646; width: 270px; max-height: 42vh; overflow: auto;
+  background: rgba(15, 15, 25, .94); color: #eee; border: 1px solid rgba(255, 255, 255, .15); border-radius: 10px;
+  font: 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; box-shadow: 0 4px 18px rgba(0, 0, 0, .5);
+}
+#kqs-panel header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, .1); font-weight: 700; cursor: pointer; user-select: none; }
+#kqs-panel.kqs-collapsed header { border-bottom: 0; }
+#kqs-panel.kqs-collapsed ul { display: none; }
+#kqs-panel button { background: none; border: 0; color: #aaa; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 2px; }
+#kqs-panel button:hover { color: #fff; }
+#kqs-panel ul { list-style: none; margin: 0; padding: 6px 10px; }
+#kqs-panel li { padding: 3px 0; }
+#kqs-panel .kqs-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+#kqs-panel .kqs-dot.kqs-lights { background: #2fbf6c; }
+#kqs-panel .kqs-dot.kqs-lit { background: #5c7cfa; }
+#kqs-panel .kqs-dot.kqs-keep { background: #e2a93b; }
+#kqs-panel .kqs-dot.kqs-dead { background: #9ca3af; }
+#kqs-panel small { color: #aaa; }
+
+/* Pulls panel (panel.js, Nov 17): priced pulls above a minimum, quest cards marked. */
+#kqs-panel { width: 300px; max-height: 50vh; }
+#kqs-panel header { gap: 8px; }
+#kqs-panel .kqp-title { flex: 1; }
+#kqs-panel .kqp-min { font-weight: 500; font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 4px; }
+#kqs-panel .kqp-min select {
+  background: #1d1d2b; color: #eee; border: 1px solid rgba(255, 255, 255, .2); border-radius: 5px;
+  font: 12px system-ui, sans-serif; padding: 1px 2px;
+}
+#kqs-panel.kqs-collapsed .kqp-min { display: none; }
+#kqs-panel li { cursor: pointer; border-radius: 6px; padding: 4px 4px; }
+#kqs-panel li:hover { background: rgba(255, 255, 255, .06); }
+#kqs-panel li.kqp-empty { cursor: default; color: #999; }
+#kqs-panel .kqp-row { display: flex; align-items: center; gap: 6px; }
+#kqs-panel .kqp-name { flex: 1; min-width: 0; color: #eee; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#kqs-panel .kqp-name:hover { color: #ffd66e; text-decoration: underline; }
+#kqs-panel .kqp-price { color: #ffd66e; font-weight: 700; white-space: nowrap; }
+#kqs-panel .kqp-rar { width: 8px; height: 8px; border-radius: 50%; flex: none; background: #888; }
+#kqs-panel .kqp-rar-common { background: #9ca3af; }
+#kqs-panel .kqp-rar-uncommon { background: #34d399; }
+#kqs-panel .kqp-rar-rare { background: #60a5fa; }
+#kqs-panel .kqp-rar-epic { background: #c084fc; }
+#kqs-panel .kqp-rar-legendary { background: #fbbf24; }
+#kqs-panel .kqp-rar-mythic { background: #f87171; }
+#kqs-panel .kqp-quest { display: inline-block; margin: 2px 0 0 14px; padding: 0 6px; border-radius: 4px; color: #fff; font-size: 11px; }
+#kqs-panel .kqp-quest.kqs-lights { background: #1f9d55; }
+#kqs-panel .kqp-quest.kqs-lit { background: #3b5bdb; }
+#kqs-panel .kqp-quest.kqs-keep { background: #b7791f; }
+#kqs-panel .kqp-quest.kqs-dead { background: #6b7280; }
+.ko-grid > li.kqp-flash { outline: 3px solid #ffd66e; outline-offset: 4px; border-radius: 8px; transition: outline-color .3s; }
