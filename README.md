@@ -57,7 +57,8 @@ come over. Turn KosMore off afterwards, or the same keys will fire twice.
 - It only talks to kosmora.io, signed in as you. Nothing is sent anywhere else, and settings stay
   in your browser.
 - Price lookups go one at a time, 4-10 seconds apart, only while the tab is visible, and pause
-  when Kosmora asks clients to slow down. Results are reused for 30 minutes.
+  when Kosmora asks clients to slow down. Results are reused for 6 hours,
+  shared by all your Kosmora tabs.
 - It never bids, buys, lists or opens packs. The only change it makes to your account is adding
   a card to an album when you press an album hotkey. **Sell N** only opens Kosmora's own batch
   sell page; you set prices and confirm there.

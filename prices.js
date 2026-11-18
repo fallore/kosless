@@ -14,7 +14,7 @@
   const AUTO_CAP = 12;               // automatic reads per summary page, at most
   const GAP_MIN = 4000, GAP_MAX = 10000;
   const CACHE_KEY = 'kqp.cache';
-  const CACHE_TTL = 30 * 60 * 1000;
+  const CACHE_TTL = 6 * 60 * 60 * 1000;   // 6 h, shared by tabs (0.6.5)
 
   // Shared by every Kosmora tab (localStorage, since 0.6.4): the price cache, the time of the last
   // read and any 429 pause. Until 0.6.3 each tab kept its own, so two tabs on pack summaries read
