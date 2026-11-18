@@ -207,5 +207,7 @@
   // The page may rebuild <body> children on navigation; put the panel back if it goes.
   new MutationObserver(() => { if (panel && !panel.isConnected) schedule(); }).observe(document.documentElement, { childList: true, subtree: false });
   setInterval(() => { if (panel && !panel.isConnected) schedule(); }, 2000);
+  // 0.6.9: hidden on Nadir pages, where it sat over the game's End turn button and Auto switch.
+  setInterval(() => { if (panel) panel.style.display = location.pathname.startsWith('/nadir') ? 'none' : ''; }, 300);
   render();
 })();
