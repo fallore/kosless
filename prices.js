@@ -60,12 +60,15 @@
   }
 
   // Tell the Pulls panel (panel.js) about a priced card.
-  function announce(key, hit) {
+  // li: the summary card being drawn, if any. A price first read on a sell page has no name or
+  // rarity in the cache, so take them from the card on screen (0.6.14).
+  function announce(key, hit, li) {
     const p = hit.p || {};
     const last = p.sales && p.sales[0];
+    const info = li && (!hit.name || !hit.rarity) ? cardInfo(li) : null;
     try {
       window.dispatchEvent(new CustomEvent('kqp-price', { detail: {
-        key, id: key.split(':')[0], name: hit.name || '', rarity: hit.rarity || '', finish: hit.finish || '',
+        key, id: key.split(':')[0], name: hit.name || (info && info.name) || '', rarity: hit.rarity || (info && info.rarity) || '', finish: hit.finish || '',
         median: kosmo(p.median), last: last ? kosmo(last.price) : 0, count: p.count || 0,
       } }));
     } catch (e) { /* ignore */ }
@@ -100,7 +103,7 @@
     }
     const p = hit.p;
     const fin = hit.finish === 'veil' ? 'shiny ' : '';
-    announce(key, hit);
+    announce(key, hit, li);
     if (!p.count) {
       c.className = 'kqp-chip kqp-none';
       c.textContent = 'no ' + fin + 'sales';
@@ -149,7 +152,8 @@
       const list = waiting.get(key);
       if (list) { list.push(cb); return; }
       waiting.set(key, [cb]);
-      queue.unshift({ key, id, finish, fa: false, name: '', rarity: '' });
+      // panel: false (0.6.14): a sell-page lookup isn't a pull, so it stays out of the Pulls panel.
+      queue.unshift({ key, id, finish, fa: false, name: '', rarity: '', panel: false });
       pump();
     },
     queued: () => queue.length,
@@ -207,7 +211,9 @@
     cache[job.key] = entry;
     saveCache();
     // Tell the panel even if the card is no longer on screen (you left the summary meanwhile).
-    if (!entry.err) announce(job.key, entry);
+    // Sell-page lookups (panel: false) don't; if a summary card was also waiting on this read, its
+    // render below announces it with the card's own name.
+    if (!entry.err && job.panel !== false) announce(job.key, entry);
     (waiting.get(job.key) || []).forEach((li) => {
       if (typeof li === 'function') { try { li(entry); } catch (e) { /* ignore */ } }
       else if (li.isConnected) render(li, job.key);

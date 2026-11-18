@@ -22,6 +22,8 @@
   // Rows saved by older versions: the map key is the row's key (0.6.1 stored a shiny row under "<id>"
   // with key "<id>:veil"; trusting row.key left that row unpickable).
   for (const k of Object.keys(rows)) { rows[k].key = k; rows[k].id = String(rows[k].id || k.split(':')[0]); }
+  // 0.6.12-0.6.13 listed prices looked up on the batch sell page as nameless "card <id>" rows. Drop them.
+  for (const [k, r] of Object.entries(rows)) if (!r.quest && !r.rarity && /^card \d+$/.test(r.name || '')) delete rows[k];
   let min = store.get(localStorage, MIN_KEY, 100);
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
   const QUEST_TEXT = { lights: 'lights a star', lit: 'star lit, sale stock', keep: 'keep, lights when followed', dead: 'gift copy, never counts' };
