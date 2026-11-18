@@ -146,6 +146,12 @@
     if (!list.length) return false;
     const cur = focusedLi && focusedLi.isConnected ? list.findIndex((b) => b.parentElement === focusedLi) : -1;
     let i = which === 'first' ? 0 : which === 'last' ? list.length - 1 : which === 'next' ? cur + 1 : (cur < 0 ? list.length - 1 : cur - 1);
+    if (which === 'up' || which === 'down') {
+      // Cards per row = how many share the first card's top edge (the row size changes with the - / = pill).
+      const top0 = list[0].parentElement.getBoundingClientRect().top;
+      const cols = Math.max(1, list.filter((b) => Math.abs(b.parentElement.getBoundingClientRect().top - top0) < 4).length);
+      i = cur < 0 ? 0 : which === 'down' ? Math.min(list.length - 1, cur + cols) : (cur - cols >= 0 ? cur - cols : cur);
+    }
     i = Math.max(0, Math.min(list.length - 1, i));
     focusedLi?.classList.remove('kq-focus');
     focusedLi = list[i].parentElement;
@@ -249,15 +255,17 @@
 
     // Pack opening
     if (onOpen && s.pack.enabled) {
-      const action = Object.keys(s.pack.keys).find((k) => s.pack.keys[k] === combo);
-      if (action) {
+      // One key can mean different things on the summary and during the opening (S: row down / skip).
+      const acts = Object.keys(s.pack.keys).filter((k) => s.pack.keys[k] === combo);
+      if (acts.length) {
         const sum = find(document, SEL.summary);
+        const action = acts.find((a) => (sum ? a !== 'skip' : !['upRow', 'downRow', 'seeCard', 'price', 'firstCard', 'lastCard', 'previousCard'].includes(a))) || acts[0];
         if (sum) {
           if (action === 'nextPack') {
             const b = find(sum, SEL.nextPack) || find(sum, SEL.backToPacks);
             if (b) { consume(ev); handled = ev.code; if (b.matches(SEL.nextPack)) armSkip(); b.click(); }
-          } else if (action === 'nextCard' || action === 'previousCard' || action === 'firstCard' || action === 'lastCard') {
-            const w = { nextCard: 'next', previousCard: 'prev', firstCard: 'first', lastCard: 'last' }[action];
+          } else if (['nextCard', 'previousCard', 'firstCard', 'lastCard', 'upRow', 'downRow'].includes(action)) {
+            const w = { nextCard: 'next', previousCard: 'prev', firstCard: 'first', lastCard: 'last', upRow: 'up', downRow: 'down' }[action];
             if (focusGrid(w)) { consume(ev); handled = ev.code; }
           } else if (action === 'seeCard') {
             const c = focusedLi && focusedLi.isConnected ? cardOf(focusedLi) : targetCard();

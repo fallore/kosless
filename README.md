@@ -28,21 +28,64 @@ Not made by or affiliated with Kosmora.
 **Hotkeys** (all changeable in settings)
 - **Albums**: point at a card and press a key to add it to an album (for example, a "sell" album).
   Your album keys are listed at the bottom of pack pages; click the list to change them.
-- **Pack opening**: next card, previous, first/last, skip, next pack, open card, price the focused card (Q); any key dismisses
+- **Pack opening**: WASD to move around the summary (W/S rows, A/D cards), first/last, skip (S while opening), next pack,
+  open card (F), price the focused card (Q); any key dismisses
   a found-pack popup. Optional auto-skip and auto-dismiss (off by default).
 - **Navigation**: Shift+letter to jump to Home, Collection, Market, Packs, Talents and more.
 
 ## Install
 
-1. Download this repository (Code → Download ZIP) and unzip it.
-2. Open `chrome://extensions` (or `edge://extensions`), turn on **Developer mode**.
-3. Click **Load unpacked** and pick the unzipped folder.
+KosLess isn't in any extension store, so it doesn't update by itself. You install it from a folder
+and update it by replacing that folder (below).
+
+> [!IMPORTANT]
+> **Pick a permanent home for the folder first**, for example `Documents\KosLess`, not your
+> Downloads folder. Your browser remembers the extension *by where the folder is*. Move it,
+> rename it or delete it, and the extension breaks or loses your settings.
+
+### Chrome
+
+1. Download this repository (green **Code** button → **Download ZIP**) and unzip it into that
+   permanent folder.
+2. Open `chrome://extensions` and turn on **Developer mode** (top right).
+3. Click **Load unpacked** (top left) and pick the folder that has `manifest.json` in it.
 4. Refresh any open Kosmora tab.
 
-**Firefox**: open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick
-`manifest.json` in the unzipped folder. Firefox removes temporary add-ons when it closes.
+### Edge
 
-To update, replace the folder, click the extension's reload button, and refresh Kosmora.
+Same as Chrome, at `edge://extensions`. **Developer mode** is a switch in the left-hand menu
+(or at the bottom of the page on narrow windows). Then **Load unpacked**, pick the folder, and
+refresh Kosmora.
+
+### Firefox
+
+If you use Firefox, you obviously already know what you're doing. Firefox only runs unsigned
+add-ons as *temporary* ones, though:
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on** and pick `manifest.json` in the folder.
+3. Refresh any open Kosmora tab.
+
+> [!WARNING]
+> **Firefox removes temporary add-ons every time it closes.** Repeat steps 1-2 after each restart.
+
+## Updating
+
+> [!CAUTION]
+> **Unzip the new version OVER the old folder, in the same place. Don't load it as a second copy.**
+> If you unzip it somewhere new (Windows likes to call it `kosless-main (1)`) and click
+> **Load unpacked** again, your browser treats it as a *different* extension. Your album keys and
+> settings stay behind in the old copy, and with both copies on, **every hotkey fires twice**.
+> If that happens, remove the extra copy on the extensions page and keep the original.
+
+1. Download the new ZIP and unzip it into the **same folder**, replacing the old files.
+2. On `chrome://extensions` / `edge://extensions`, click the **reload** arrow (↻) on KosLess.
+   Check that the version number changed.
+3. Refresh any open Kosmora tab.
+
+Firefox: after replacing the files, click **Reload** on KosLess in `about:debugging`.
+
+Using git? `git clone` it once into the permanent folder, then `git pull` and step 2 to update.
 
 ## Settings
 

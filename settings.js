@@ -18,7 +18,7 @@
     },
     pack: {
       enabled: true,
-      keys: { nextCard: 'KeyD', previousCard: 'KeyA', skip: 'KeyS', nextPack: 'KeyE', seeCard: 'KeyW', firstCard: 'Home', lastCard: 'End', price: 'KeyQ' },
+      keys: { nextCard: 'KeyD', previousCard: 'KeyA', skip: 'KeyS', nextPack: 'KeyE', upRow: 'KeyW', downRow: 'KeyS', seeCard: 'KeyF', firstCard: 'Home', lastCard: 'End', price: 'KeyQ' },
       anyKeyDismiss: true,
       autoSkip: false,
       autoDismiss: false,
@@ -49,7 +49,7 @@
     tomes: 'Tomes', families: 'Families', gallery: 'Gallery', atlas: 'Atlas', myActivity: 'My Activity', history: 'History',
   };
   const PACK_LABELS = {
-    nextCard: 'Next card (tear / reveal / next on summary)', previousCard: 'Previous card (summary)', skip: 'Skip opening',
+    nextCard: 'Next card (tear / reveal / next on summary)', previousCard: 'Previous card (summary)', upRow: 'Row up (summary)', downRow: 'Row down (summary)', skip: 'Skip opening',
     nextPack: 'Next pack', seeCard: 'Open focused card', firstCard: 'First card (summary)', lastCard: 'Last card (summary)', price: 'Price of the focused card (summary, same as its $)',
   };
 
@@ -65,23 +65,33 @@
   const listeners = [];
   const STORE_KEY = 'kqSettings';
 
+  // 0.6.8: W/S move between rows on the summary. Settings saved before that (or a KosMore import)
+  // have 'open card' on W, which would clash: it moves to F (or off, if F is taken).
+  function fixKeys(c) {
+    const k = c.pack && c.pack.keys;
+    if (k && k.seeCard && (k.seeCard === k.upRow || k.seeCard === k.downRow)) {
+      k.seeCard = Object.entries(k).some(([a, v]) => a !== 'seeCard' && v === 'KeyF') ? '' : 'KeyF';
+    }
+    return c;
+  }
+
   function load() {
     try {
       chrome.storage.local.get(STORE_KEY, (r) => {
         if (chrome.runtime.lastError) return;
-        current = merge(DEFAULTS, (r && r[STORE_KEY]) || {});
+        current = fixKeys(merge(DEFAULTS, (r && r[STORE_KEY]) || {}));
         listeners.forEach((f) => { try { f(current); } catch (e) { /* ignore */ } });
       });
       chrome.storage.onChanged.addListener((ch, area) => {
         if (area !== 'local' || !ch[STORE_KEY]) return;
-        current = merge(DEFAULTS, ch[STORE_KEY].newValue || {});
+        current = fixKeys(merge(DEFAULTS, ch[STORE_KEY].newValue || {}));
         listeners.forEach((f) => { try { f(current); } catch (e) { /* ignore */ } });
       });
     } catch (e) { /* storage unavailable: defaults */ }
   }
 
   function save(next) {
-    current = merge(DEFAULTS, next);
+    current = fixKeys(merge(DEFAULTS, next));
     try { chrome.storage.local.set({ [STORE_KEY]: current }); } catch (e) { /* ignore */ }
   }
 
