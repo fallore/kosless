@@ -49,10 +49,11 @@ and update it by replacing that folder (below).
 
 ### Chrome
 
-1. Download this repository (green **Code** button → **Download ZIP**) and unzip it into that
-   permanent folder.
+1. Download **[kosless.zip](https://github.com/fallore/kosless/releases/latest/download/kosless.zip)**
+   (always the newest version). Right-click it → **Extract All…** and extract it into that
+   permanent folder, so `manifest.json` sits directly in `Documents\KosLess`.
 2. Open `chrome://extensions` and turn on **Developer mode** (top right).
-3. Click **Load unpacked** (top left) and pick the folder that has `manifest.json` in it.
+3. Click **Load unpacked** (top left) and pick that folder (the one with `manifest.json` in it).
 4. Refresh any open Kosmora tab.
 
 ### Edge
@@ -77,12 +78,15 @@ add-ons as *temporary* ones, though:
 
 > [!CAUTION]
 > **Unzip the new version OVER the old folder, in the same place. Don't load it as a second copy.**
-> If you unzip it somewhere new (Windows likes to call it `kosless-main (1)`) and click
+> If you unzip it somewhere new (Windows likes to call it `kosless (1)`) and click
 > **Load unpacked** again, your browser treats it as a *different* extension. Your album keys and
 > settings stay behind in the old copy, and with both copies on, **every hotkey fires twice**.
 > If that happens, remove the extra copy on the extensions page and keep the original.
 
-1. Download the new ZIP and unzip it into the **same folder**, replacing the old files.
+1. Download **[kosless.zip](https://github.com/fallore/kosless/releases/latest/download/kosless.zip)**
+   again (the link always gives the newest version) and extract it into the folder you loaded,
+   the one with `manifest.json` in it. When Windows asks, choose **Replace the files**.
+   (Installed from the old green-button ZIP? Your folder is the inner `kosless-main`; extract there.)
 2. On `chrome://extensions` / `edge://extensions`, click the **reload** arrow (↻) on KosLess.
    Check that the version number changed.
 3. Refresh any open Kosmora tab.
@@ -90,6 +94,10 @@ add-ons as *temporary* ones, though:
 Firefox: after replacing the files, click **Reload** on KosLess in `about:debugging`.
 
 Using git? `git clone` it once into the permanent folder, then `git pull` and step 2 to update.
+
+**Hear about updates:** on the repo page, **Watch** → **Custom** → tick **Releases**. GitHub then
+tells you when a new version is out. The [Releases page](https://github.com/fallore/kosless/releases)
+says what changed.
 
 ## Settings
 
