@@ -10,8 +10,9 @@ Not made by or affiliated with Kosmora.
 **Pack summaries**
 - Bigger, readable cards on 10-pack and megapack summaries, without zooming the whole site.
   Choose how many per row with the **− N per row +** pill or the `-` / `=` keys.
-- **Price chips**: Epic, Legendary, Mythic and quest cards show their 30-day median and last
-  sale automatically. Every other card has a small **$** button to look it up.
+- **Price chips**: pack summary cards show their 30-day median and last sale automatically:
+  every card by default, or only Uncommon / Rare / Epic and up (your choice in settings; quest
+  cards always). Any card left out has a small **$** button to look it up.
 - **Quest badges** on cards that belong to a quest: lights a star, already lit, keep (quest you
   don't follow yet), or a gift copy that never counts.
 
@@ -102,9 +103,10 @@ come over. Turn KosMore off afterwards, or the same keys will fire twice.
 
 - It only talks to kosmora.io, signed in as you. Nothing is sent anywhere else, and settings stay
   in your browser.
-- Price lookups go one at a time, 4-10 seconds apart, only while the tab is visible, and pause
-  when Kosmora asks clients to slow down. Results are reused for 6 hours,
-  shared by all your Kosmora tabs.
+- Price lookups go one at a time and stay under Kosmora's limit for them (120 a minute), and
+  pause for as long as Kosmora asks if it ever says to slow down. Opening packs faster than that
+  just means the prices fill in a little later; if you open a lot at once, set Auto-price to
+  Uncommon or Rare and up. Results are reused for 6 hours, shared by all your Kosmora tabs.
 - It never bids, buys, lists or opens packs. The only change it makes to your account is adding
   a card to an album when you press an album hotkey. **Sell N** only opens Kosmora's own batch
   sell page; you set prices and confirm there.

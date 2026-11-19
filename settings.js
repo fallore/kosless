@@ -24,6 +24,9 @@
       autoDismiss: false,
     },
     legend: true,   // key legend at the bottom of pack pages
+    // 0.7.0: which summary cards get priced without a click (prices.js): all, uncommon, rare, epic
+    // (that rarity and up) or none. Quest cards always are.
+    prices: { auto: 'all' },
     albums: {
       enabled: true,
       list: [],   // { id, name, key }
@@ -146,6 +149,12 @@
           <label><input type="checkbox" data-k="pack.anyKeyDismiss"> Any key dismisses a found-pack popup</label>
           <label><input type="checkbox" data-k="pack.autoDismiss"> Auto-dismiss Rogue/Mega found-pack popups</label>
           <label><input type="checkbox" data-k="pack.autoSkip"> Auto-skip the next pack's opening (after Next pack; needs Kosmora's reveal hints on)</label></section>
+        <section><h4>Price chips</h4>
+          <label>Auto-price on pack summaries <select data-s="prices.auto">
+            <option value="all">Every card</option><option value="uncommon">Uncommon and up</option>
+            <option value="rare">Rare and up</option><option value="epic">Epic and up</option>
+            <option value="none">None (only $ and Q)</option></select></label>
+          <p class="kq-hint">Quest cards are always priced. Reads stay under Kosmora's limit of 120 a minute, so opening packs fast with "Every card" just makes the prices arrive later; cards below the level get a $ to price them one at a time.</p></section>
         <section><h4><label><input type="checkbox" data-k="nav.enabled"> Navigation</label></h4>
           <div class="kq-grid" data-group="nav"></div></section>
         <section><h4><label><input type="checkbox" data-k="sell.enabled"> Sell page</label></h4>
@@ -245,6 +254,7 @@
     d.querySelector('.kq-quick').value = s.sell.quick.join(', ');
     d.querySelectorAll('[data-k]').forEach((i) => { i.checked = !!get(i.dataset.k); });
     d.querySelectorAll('[data-n]').forEach((i) => { i.value = get(i.dataset.n); });
+    d.querySelectorAll('[data-s]').forEach((i) => { i.value = get(i.dataset.s); });
 
     const file = d.querySelector('.kq-import input[type=file]');
     const msg = d.querySelector('.kq-import-msg');
@@ -283,6 +293,7 @@
     d.querySelector('.kq-save').addEventListener('click', () => {
       d.querySelectorAll('[data-k]').forEach((i) => set(i.dataset.k, i.checked));
       d.querySelectorAll('[data-n]').forEach((i) => set(i.dataset.n, Number(i.value) || 0));
+      d.querySelectorAll('[data-s]').forEach((i) => set(i.dataset.s, i.value));
       s.sell.quick = d.querySelector('.kq-quick').value.split(/[^\d.]+/).map(Number).filter((n) => n > 0).slice(0, 10);
       stopCapture(); save(s); close(); toast('Settings saved');
     });

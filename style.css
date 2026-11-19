@@ -1,4 +1,4 @@
-/* Kosmora KosLess */
+/* KosLess */
 .kqs-badge {
   position: absolute; bottom: 33%; left: 6px; z-index: 5; pointer-events: none; /* over the lower art, clear of the name plate and footer */
   font: 700 11px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .02em;

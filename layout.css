@@ -45,6 +45,24 @@
   background: rgba(15, 15, 25, .82); color: #ffd66e; cursor: pointer; padding: 0; opacity: .75;
 }
 .ko-grid > li > .kqp-btn:hover { opacity: 1; background: rgba(60, 40, 8, .95); }
+.ko-grid > li > .kqp-chip.kqp-none { padding: 2px 6px; opacity: .85; }   /* 0.7.2: just "no" */
+
+/* 1b. Single-pack summary ("Nice pull", one pack's 6-7 cards), 0.7.2, Nov 18, 2026.
+   The site sizes cards from the grid's width (--ko-cols per row) inside a ~1000 px column, so on a
+   wide window they're small with empty space around. Widen the grid past its column (centred with
+   negative margins) and keep a 7-card pack on one row. Scoped to .ko-summary-scene: if the site renames it, nothing changes. */
+@media (min-width: 900px) {
+  .ko-summary-scene .ko-grid:not(.ko-grid-many):not(.t3d-grid) {
+    --kqs-w: min(1560px, 94vw);
+    width: var(--kqs-w) !important; max-width: none !important;
+    margin-left: calc((100% - var(--kqs-w)) / 2) !important;
+    margin-right: calc((100% - var(--kqs-w)) / 2) !important;
+  }
+  .ko-summary-scene .ko-grid:not(.ko-grid-many):not(.t3d-grid):has(> li:nth-child(7)) { --ko-cols: 7 !important; }
+  .ko-summary-scene .ko-grid:not(.ko-grid-many):not(.t3d-grid) .ko-new-caption { font-size: .85rem; }
+  /* Chips stay over the top of the art, as everywhere else (0.7.3; 0.7.2 put them under the card,
+     which read worse). */
+}
 
 /* 2. Sell page (/market/sell?subject=...): put "Last sales of this card" and "History" in a third
    column beside the form, so they show without scrolling. Only on wide windows; narrower ones

@@ -1,4 +1,4 @@
-// Kosmora KosLess: content script. Display-only.
+// KosLess: content script. Display-only.
 // Reads /api/quests (the same JSON the Quests page loads) at most once per 10 minutes,
 // then badges every rendered card that is a quest star. No per-card requests, no writes.
 (() => {
@@ -48,7 +48,7 @@
         map = buildMap(data);
         loadedAt = Date.now();
       } catch (e) {
-        console.warn('[quest-spotter] quests unavailable:', e);
+        console.warn('[kosless] quests unavailable:', e);
         if (!map) map = new Map();
       } finally {
         loading = null;
@@ -160,7 +160,7 @@
   let pending = 0;
   function schedule() {
     if (pending) return;
-    pending = setTimeout(() => { pending = 0; try { scan(); } catch (e) { console.warn('[quest-spotter]', e); } }, 120);
+    pending = setTimeout(() => { pending = 0; try { scan(); } catch (e) { console.warn('[kosless]', e); } }, 120);
   }
 
   const mo = new MutationObserver((muts) => {

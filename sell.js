@@ -37,6 +37,12 @@
       const c = JSON.parse(localStorage.getItem('kqp.cache') || '{}')[id];
       if (c && c.p && !c.err && Date.now() - c.at < 6 * 60 * 60 * 1000) return c.p;
     } catch (e) { /* ignore */ }
+    // 0.7.0: through the price chips' queue (front of it), so this read counts toward the same
+    // per-minute budget and waits out a 429 instead of failing.
+    const api = window.__kqp;
+    if (api && api.request) {
+      return new Promise((res, rej) => api.request(id, '', (e) => (e && !e.err ? res(e.p) : rej(new Error((e && e.err) || 'no data')))));
+    }
     const r = await fetch('/api/cards/' + id + '/prices', { credentials: 'include' });
     if (!r.ok) throw new Error(r.status === 429 ? 'rate limited' : 'HTTP ' + r.status);
     return (await r.json()).prices || {};

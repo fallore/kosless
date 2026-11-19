@@ -279,10 +279,15 @@
             const c = focusedLi && focusedLi.isConnected ? cardOf(focusedLi) : targetCard();
             if (c) { consume(ev); handled = ev.code; go('/card/' + c.id); }
           } else if (action === 'price') {
-            // Same as clicking the card's $ (prices.js): the focused card (A/D), else the one under the pointer.
+            // Same as clicking the card's $ (prices.js), or (0.7.0) moving its queued read to the front:
+            // the focused card (A/D), else the one under the pointer.
             const t = focusedLi && focusedLi.isConnected ? null : targetCard();
             const li = focusedLi && focusedLi.isConnected ? focusedLi : t && t.root && t.root.closest('.ko-grid > li');
-            if (li) { consume(ev); handled = ev.code; const b = li.querySelector(':scope > .kqp-btn'); if (b) b.click(); }
+            if (li) {
+              consume(ev); handled = ev.code;
+              if (window.__kqp && window.__kqp.prioritize) window.__kqp.prioritize(li);
+              else { const b = li.querySelector(':scope > .kqp-btn'); if (b) b.click(); }
+            }
           }
           return;
         }
