@@ -49,7 +49,7 @@ and update it by replacing that folder (below).
 
 ### Chrome
 
-1. Download **[kosless.zip](https://github.com/fallore/kosless/releases/latest/download/kosless.zip)**
+1. Download **[kosless.zip](../../releases/latest/download/kosless.zip)**
    (always the newest version). Right-click it → **Extract All…** and extract it into that
    permanent folder, so `manifest.json` sits directly in `Documents\KosLess`.
 2. Open `chrome://extensions` and turn on **Developer mode** (top right).
@@ -83,7 +83,7 @@ add-ons as *temporary* ones, though:
 > settings stay behind in the old copy, and with both copies on, **every hotkey fires twice**.
 > If that happens, remove the extra copy on the extensions page and keep the original.
 
-1. Download **[kosless.zip](https://github.com/fallore/kosless/releases/latest/download/kosless.zip)**
+1. Download **[kosless.zip](../../releases/latest/download/kosless.zip)**
    again (the link always gives the newest version) and extract it into the folder you loaded,
    the one with `manifest.json` in it. When Windows asks, choose **Replace the files**.
    (Installed from the old green-button ZIP? Your folder is the inner `kosless-main`; extract there.)
@@ -96,7 +96,7 @@ Firefox: after replacing the files, click **Reload** on KosLess in `about:debugg
 Using git? `git clone` it once into the permanent folder, then `git pull` and step 2 to update.
 
 **Hear about updates:** on the repo page, **Watch** → **Custom** → tick **Releases**. GitHub then
-tells you when a new version is out. The [Releases page](https://github.com/fallore/kosless/releases)
+tells you when a new version is out. The [Releases page](../../releases)
 says what changed.
 
 ## Settings
