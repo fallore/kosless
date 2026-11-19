@@ -42,6 +42,9 @@ Not made by or affiliated with Kosmora.
 KosLess isn't in any extension store, so it doesn't update by itself. You install it from a folder
 and update it by replacing that folder (below).
 
+**Prefer pictures?** The [illustrated install guide](https://claude.ai/artifact/MX2nvM3DXwNBWJHw76TmSH)
+walks through the same steps with a drawing of each screen, for Chrome, Edge and Firefox.
+
 > [!IMPORTANT]
 > **Pick a permanent home for the folder first**, for example `Documents\KosLess`, not your
 > Downloads folder. Your browser remembers the extension *by where the folder is*. Move it,
