@@ -89,7 +89,8 @@
       if (!r.ok) throw new Error('card read ' + r.status);
       const col = await r.json();
       const inAlbum = (col.albums || []).some((a) => (a && (a.id || a)) === album.id);
-      if (inAlbum) { kq.toast(c.name + ' is already in ' + album.name); tag(c.root, album.name); return; }
+      // An album holds a card once (its entry points at one copy), so a second copy has nowhere to go.
+      if (inAlbum) { kq.toast(c.name + ' is already in ' + album.name + ' (an album holds one copy of a card)'); tag(c.root, album.name); return; }
       const all = col.copies || [];
       if (!all.length) { kq.toast("You don't have a copy of " + c.name, 'err'); return; }
       const free = all.filter((x) => !x.state || x.state === 'available');

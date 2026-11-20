@@ -37,13 +37,24 @@
   }
 
   // Which pack opening (or page) a pull was seen on. A recap of the same opening has the same id.
-  const ctx = () => (location.pathname === '/packs/open' && new URLSearchParams(location.search).get('id')) || location.pathname;
+  // 0.7.4: multi-pack openings are /packs/open?batch=<id> (read from the site's bundle, Nov 20).
+  // Reading only ?id= gave every batch the same context "/packs/open", so a card removed from the
+  // panel once stayed hidden for every later batch, and a repeat pull never counted as new.
+  const ctx = () => {
+    if (location.pathname !== '/packs/open') return location.pathname;
+    const p = new URLSearchParams(location.search);
+    const id = p.get('batch') || p.get('id') || p.get('pack');
+    return id ? '/packs/open?' + id : location.pathname;
+  };
 
   // 0.6.13: removed rows. The price chips announce a card again every time its summary is drawn
   // (from the cache), so a removed row would come straight back on Back or a recap. Remember where
   // each removed row was seen and ignore it there; the same card from a different pack comes back.
   const HIDDEN_KEY = 'kqp.hidden';
   const hidden = store.get(sessionStorage, HIDDEN_KEY, {});   // key -> ctx it was removed from
+  // Removals saved by 0.7.3 and older under the bare "/packs/open" context would keep hiding
+  // those cards in every batch; forget them.
+  for (const k of Object.keys(hidden)) if (hidden[k] === '/packs/open') delete hidden[k];
   function remove(keys) {
     for (const k of keys) {
       if (!rows[k]) continue;
@@ -66,13 +77,39 @@
 
   // Rows are keyed like the price chips: "<id>" for plain, "<id>:veil" for shiny, so a plain and
   // a shiny copy of the same card get their own rows. row.id is always the card id.
+  // 0.7.4: a repeat pull (same card, another opening) moves the row's time and context to now, so
+  // the 200-row trim can't drop it as the oldest row, and Remove hides it from the right pack.
   function upsert(key, patch) {
-    const r = rows[key] || { key, id: String(key).split(':')[0], at: Date.now(), ctx: ctx() };
+    const here = ctx();
+    const r = rows[key] || { key, id: String(key).split(':')[0], at: Date.now(), ctx: here };
+    if (r.ctx !== here) { r.at = Date.now(); r.ctx = here; delete r.sent; }   // a new copy isn't the one sent to Sell
     Object.assign(r, patch);
     rows[key] = r;
     save();
     schedule();
   }
+
+  // 0.7.4: copies. A row is one card; it now counts the copies of that card seen on each pack
+  // summary (cells on the grid, which is one cell per copy), summed over openings, and shows ×N.
+  // Per opening it keeps the most cells seen, so a recap or Back doesn't count them twice.
+  function countCopies() {
+    const here = ctx();
+    if (!here.startsWith('/packs/open')) return;
+    const seen = {};
+    document.querySelectorAll('ul.ko-grid:not(.t3d-grid) > li[data-kqp]').forEach((li) => {
+      const k = li.dataset.kqp;
+      seen[k] = (seen[k] || 0) + 1;
+    });
+    let changed = false;
+    for (const [k, n] of Object.entries(seen)) {
+      const r = rows[k];
+      if (!r) continue;
+      r.copies = r.copies || {};
+      if ((r.copies[here] || 0) < n) { r.copies[here] = n; changed = true; }
+    }
+    if (changed) { save(); schedule(); }
+  }
+  const copiesOf = (r) => Object.values(r.copies || {}).reduce((a, b) => a + b, 0);
 
   window.addEventListener('kqp-price', (ev) => {
     const d = ev.detail; if (!d || !d.id) return;
@@ -208,6 +245,16 @@
       name.href = '/card/' + r.id;
       name.title = 'Open ' + r.name + '\'s card page (Ctrl/middle-click: new tab)';
       name.textContent = r.name + (r.finish === 'veil' ? ' ✦' : '');
+      // Outside the name, which ellipsizes, so a long name can't hide the count.
+      const nCopies = copiesOf(r);
+      let x = null;
+      if (nCopies > 1) {
+        x = document.createElement('span');
+        x.className = 'kqp-copies';
+        x.textContent = '×' + nCopies;
+        const nOpen = Object.keys(r.copies).length;
+        x.title = nCopies + ' copies pulled this session, in ' + nOpen + ' opening' + (nOpen > 1 ? 's' : '');
+      }
       name.addEventListener('click', (ev) => ev.stopPropagation());
       const price = document.createElement('span');
       price.className = 'kqp-price';
@@ -225,7 +272,7 @@
       del.title = 'Take ' + r.name + ' off this list (the card is not touched)';
       del.setAttribute('aria-label', del.title);
       del.addEventListener('click', (ev) => { ev.stopPropagation(); remove([r.key]); });
-      top.append(dot, name, price, del);
+      top.append(...[dot, name, x, price, del].filter(Boolean));
       li.appendChild(top);
       if (r.quest) {
         const q = document.createElement('small');
@@ -254,7 +301,7 @@
   let pending = 0;
   function schedule() {
     if (pending) return;
-    pending = setTimeout(() => { pending = 0; try { render(); } catch (e) { console.warn('[pulls-panel]', e); } }, 150);
+    pending = setTimeout(() => { pending = 0; try { countCopies(); render(); } catch (e) { console.warn('[pulls-panel]', e); } }, 150);
   }
 
   // The page may rebuild <body> children on navigation; put the panel back if it goes.

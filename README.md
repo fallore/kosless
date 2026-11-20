@@ -18,7 +18,7 @@ Not made by or affiliated with Kosmora.
 
 **Pulls panel** (bottom right)
 - Every card priced this session, priciest first, with a minimum-price filter. Quest cards
-  always show. Card names link to the card's page.
+  always show. Card names link to the card's page. A card you pulled more than once shows **×N**.
 - **Select → Sell N** opens Kosmora's *Sell several cards* page with the ticked cards (up to 60).
   They stay ticked and marked *sent to Sell*, so once they're listed, **Remove** takes them off the list.
 - The **×** on a row (shows on hover) removes that one card; the **×** in the header clears the
