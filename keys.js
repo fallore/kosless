@@ -1,7 +1,7 @@
 // KosLess hotkeys (Nov 17, 2026): navigation, pack opening, album adds, auto-skip and
 // auto-dismiss. Rebuilt from KosMore 1.8.0's behaviour (its selectors and album call), not its code.
 // Settings: settings.js (window.__kq). Every action is a key the player presses, except auto-skip and
-// auto-dismiss, which press Kosmora's own button after a short random delay.
+// auto-dismiss, which press Kosmora's own button at once (no delay since 0.7.5).
 (() => {
   if (window.__kqKeys) return;
   window.__kqKeys = true;
@@ -166,7 +166,6 @@
   // ---- auto-skip / auto-dismiss ----
   const SKIP_KEY = 'kq.skipped.';
   let pendingSkip = null;   // { from, until, target }
-  let skipTimer = 0;
   function armSkip() {
     const s = S();
     if (!s.pack.enabled || !s.pack.autoSkip) return;
@@ -174,7 +173,7 @@
   }
   function tryAutoSkip() {
     const p = pendingSkip;
-    if (!p || skipTimer) return;
+    if (!p) return;
     if (location.pathname !== OPEN || Date.now() > p.until) { pendingSkip = null; return; }
     const params = new URLSearchParams(location.search);
     const id = openingId();
@@ -185,42 +184,39 @@
     if (scene.querySelector(SEL.skipNote) || topModal() || find(scene, '.ko-pack-burst, .ko-table:not(.ko-table-ahead)')) { pendingSkip = null; return; }
     if (!find(scene, SEL.packReady) || !find(scene, SEL.skip)) return;
     if (scene.dataset.hints !== 'on') { pendingSkip = null; return; }   // without hints a special pack could be skipped blind
-    skipTimer = setTimeout(() => {
-      skipTimer = 0;
-      const sc = find(document, SEL.scene);
-      const btn = sc && find(sc, SEL.skip);
-      if (!pendingSkip || !btn || openingId() !== id || sc.querySelector(SEL.skipNote) || topModal()) return;
-      pendingSkip = null;
-      try { sessionStorage.setItem(SKIP_KEY + id, '1'); } catch (e) { /* ignore */ }
-      btn.click();
-    }, rand(350, 900));
+    // 0.7.5: no wait (was 0.35-0.9 s), as KosMore 1.8.0 does. Every check above has just passed.
+    pendingSkip = null;
+    try { sessionStorage.setItem(SKIP_KEY + id, '1'); } catch (e) { /* ignore */ }
+    find(scene, SEL.skip).click();
   }
   // 0.6.11: remember what each popup SAID, not just the element. Ten packs at once can queue a Rogue
   // and a Mega popup back to back, and if Kosmora reuses the same box for the second one, a plain
   // "seen this element" check skipped it (Nov 18). After each click, look again in case the next
   // popup is already up and no further page change comes to wake the observer.
+  // 0.7.5: no wait. It used to click 0.5-1.2 s after the popup showed (plus the 120 ms settle below),
+  // so the popup sat there and ate the next key press. KosMore 1.8.0 clicks on the next animation frame
+  // after the page change; this does the same.
   let dismissed = new WeakMap();
-  let dismissTimer = 0;
-  const dropSig = (m) => m.className + '|' + (m.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120);
   function tryAutoDismiss() {
     const s = S();
-    if (!s.pack.enabled || !s.pack.autoDismiss || location.pathname !== OPEN || dismissTimer) return;
+    if (!s.pack.enabled || !s.pack.autoDismiss || location.pathname !== OPEN) return;
+    if (!document.querySelector('.ko-drop')) { dismissed = new WeakMap(); return; }   // cheap exit: no layout read
     const m = topModal();
     if (!m) { dismissed = new WeakMap(); return; }
     if (!m.matches('.ko-drop')) return;
     if (!m.classList.contains('ko-drop-rogue') && !m.classList.contains('ko-drop-mega')) return;
+    const b = find(m, SEL.dropBtn);
+    if (!b) return;   // button not usable yet: the next page change looks again
     const sig = dropSig(m);
     if (dismissed.get(m) === sig) return;
     dismissed.set(m, sig);
-    dismissTimer = setTimeout(() => {
-      dismissTimer = 0;
-      const b = m.isConnected && find(m, SEL.dropBtn);
-      if (b) b.click();
-      for (const ms of [700, 1600, 3000]) setTimeout(() => { try { tryAutoDismiss(); } catch (e) { /* ignore */ } }, ms);
-    }, rand(500, 1200));
+    b.click();
+    for (const ms of [300, 800, 1600]) setTimeout(() => { try { tryAutoDismiss(); } catch (e) { /* ignore */ } }, ms);
   }
-  let pend = 0;
+  const dropSig = (m) => m.className + '|' + (m.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+  let pend = 0, raf = 0;
   new MutationObserver(() => {
+    if (!raf && location.pathname === OPEN) raf = requestAnimationFrame(() => { raf = 0; try { tryAutoDismiss(); tryAutoSkip(); } catch (e) { console.warn('[kq-keys]', e); } });
     if (pend) return;
     pend = setTimeout(() => { pend = 0; try { tryAutoDismiss(); tryAutoSkip(); } catch (e) { console.warn('[kq-keys]', e); } }, 120);
   }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'open', 'data-hints'] });
